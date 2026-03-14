@@ -52,6 +52,23 @@ npm run build
 npm start
 ```
 
+## Docker
+
+### Single container
+
+```bash
+docker build -t openclaw-board .
+docker run -p 3000:3000 -v $(pwd)/tickets:/data/tickets openclaw-board
+```
+
+### Docker Compose
+
+```bash
+docker compose up
+```
+
+Tickets are persisted in the `./tickets` folder on the host via a bind mount.
+
 ## API
 
 | Method | Path | Description |

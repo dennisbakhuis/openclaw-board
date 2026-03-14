@@ -16,10 +16,11 @@ export interface Ticket {
 }
 
 const COLUMNS: Column[] = ["todo", "in-progress", "review", "done"];
-const TICKETS_DIR = path.join(process.cwd(), "tickets");
+const TICKETS_BASE =
+  process.env.TICKETS_DIR ?? path.join(process.cwd(), "tickets");
 
 function columnDir(column: Column): string {
-  return path.join(TICKETS_DIR, column);
+  return path.join(TICKETS_BASE, column);
 }
 
 function ticketFilePath(id: string, column: Column): string {
