@@ -1,0 +1,10 @@
+{
+  "projects": [
+    {
+      "name": "OpenClaw Board",
+      "color": "#3b82f6",
+      "archived": false,
+      "colorIndex": 0
+    }
+  ]
+}

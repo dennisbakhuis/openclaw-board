@@ -26,12 +26,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # The tickets folder is mounted as a volume at runtime
 # so tickets persist outside the container
-RUN mkdir -p /data/tickets/todo /data/tickets/in-progress /data/tickets/review /data/tickets/done
+RUN mkdir -p /data/tickets/todo /data/tickets/in-progress /data/tickets/review /data/tickets/done /data/tickets/archived
 VOLUME ["/data/tickets"]
 
 USER nextjs
-EXPOSE 3000
-ENV PORT=3000
+EXPOSE 4321
+ENV PORT=4321
 ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]

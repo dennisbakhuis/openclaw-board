@@ -43,7 +43,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:4321](http://localhost:4321) in your browser.
 
 ## Build
 
@@ -58,7 +58,7 @@ npm start
 
 ```bash
 docker build -t openclaw-board .
-docker run -p 3000:3000 -v $(pwd)/tickets:/data/tickets openclaw-board
+docker run -p 4321:4321 -v $(pwd)/tickets:/data/tickets openclaw-board
 ```
 
 ### Docker Compose
@@ -77,7 +77,7 @@ The Docker image is automatically built and pushed to GitHub Container Registry 
 
 ```bash
 docker pull ghcr.io/dennisbakhuis/openclaw-board:latest
-docker run -p 3000:3000 -v $(pwd)/tickets:/data/tickets \
+docker run -p 4321:4321 -v $(pwd)/tickets:/data/tickets \
   -e TICKETS_DIR=/data/tickets \
   ghcr.io/dennisbakhuis/openclaw-board:latest
 ```
@@ -89,7 +89,7 @@ services:
   openclaw-board:
     image: ghcr.io/dennisbakhuis/openclaw-board:latest
     ports:
-      - "3000:3000"
+      - "4321:4321"
     volumes:
       - ./tickets:/data/tickets
     environment:

@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 
-export type Column = "todo" | "in-progress" | "review" | "done";
+export type Column = "todo" | "in-progress" | "review" | "done" | "archived";
 export type Priority = "low" | "medium" | "high";
 
 export interface Ticket {
@@ -13,6 +13,7 @@ export interface Ticket {
   labels: string[];
   created: string;
   column: Column;
+  project?: string;
 }
 
 const COLUMNS: Column[] = ["todo", "in-progress", "review", "done"];
@@ -39,15 +40,31 @@ function parseTicketFile(filePath: string, column: Column): Ticket | null {
       labels: Array.isArray(data.labels) ? data.labels : [],
       created: data.created ?? new Date().toISOString(),
       column,
+      project: data.project ?? undefined,
     };
   } catch {
     return null;
   }
 }
 
-export function readAllTickets(): Ticket[] {
+// Ensure required folders exist
+export function ensureFolders(): void {
+  const allColumns: Column[] = [...COLUMNS, "archived"];
+  for (const col of allColumns) {
+    fs.mkdirSync(columnDir(col), { recursive: true });
+  }
+}
+
+export function readAllTickets(includeArchived = false): Ticket[] {
+  // Ensure folders exist
+  ensureFolders();
+
   const tickets: Ticket[] = [];
-  for (const column of COLUMNS) {
+  const columnsToRead: Column[] = includeArchived
+    ? [...COLUMNS, "archived"]
+    : COLUMNS;
+
+  for (const column of columnsToRead) {
     const dir = columnDir(column);
     if (!fs.existsSync(dir)) continue;
     const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
@@ -62,7 +79,8 @@ export function readAllTickets(): Ticket[] {
 export function findTicket(
   id: string
 ): { ticket: Ticket; column: Column; filePath: string } | null {
-  for (const column of COLUMNS) {
+  const allColumns: Column[] = [...COLUMNS, "archived"];
+  for (const column of allColumns) {
     const fp = ticketFilePath(id, column);
     if (fs.existsSync(fp)) {
       const ticket = parseTicketFile(fp, column);
@@ -75,13 +93,16 @@ export function findTicket(
 export function writeTicket(ticket: Ticket, column: Column): void {
   const dir = columnDir(column);
   fs.mkdirSync(dir, { recursive: true });
-  const frontmatter = {
+  const frontmatter: Record<string, unknown> = {
     id: ticket.id,
     title: ticket.title,
     priority: ticket.priority,
     labels: ticket.labels,
     created: ticket.created,
   };
+  if (ticket.project) {
+    frontmatter.project = ticket.project;
+  }
   const fileContent = matter.stringify(ticket.description, frontmatter);
   fs.writeFileSync(ticketFilePath(ticket.id, column), fileContent, "utf-8");
 }
