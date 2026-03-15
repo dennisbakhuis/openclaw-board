@@ -1,0 +1,10 @@
+services:
+  openclaw-board:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./tickets:/data/tickets
+    environment:
+      - TICKETS_DIR=/data/tickets
+    restart: unless-stopped
