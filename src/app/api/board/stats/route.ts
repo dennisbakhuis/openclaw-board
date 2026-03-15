@@ -13,6 +13,7 @@ export async function GET() {
       "in-progress": 0,
       review: 0,
       done: 0,
+      archived: 0,
     };
 
     const byPriority: Record<Priority, number> = {

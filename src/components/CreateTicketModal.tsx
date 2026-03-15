@@ -2,18 +2,22 @@
 
 import { useState } from "react";
 import type { Column, Priority } from "@/lib/tickets";
+import type { Project } from "@/lib/projects";
+import ProjectCombobox from "./ProjectCombobox";
 
 interface Props {
+  projects: Project[];
   onSuccess: () => void;
   onClose: () => void;
 }
 
-export default function CreateTicketModal({ onSuccess, onClose }: Props) {
+export default function CreateTicketModal({ projects, onSuccess, onClose }: Props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<Priority>("medium");
   const [labels, setLabels] = useState("");
   const [column, setColumn] = useState<Column>("todo");
+  const [project, setProject] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -25,7 +29,27 @@ export default function CreateTicketModal({ onSuccess, onClose }: Props) {
     }
     setSubmitting(true);
     setError("");
+
     try {
+      // If a project name is provided and it doesn't exist yet, create it
+      const projectName: string | undefined = project.trim() || undefined;
+      if (projectName) {
+        const existing = projects.find(
+          (p) => p.name.toLowerCase() === projectName!.toLowerCase()
+        );
+        if (!existing) {
+          const projRes = await fetch("/api/projects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: projectName }),
+          });
+          if (!projRes.ok) {
+            const err = await projRes.json();
+            throw new Error(err.error ?? "Failed to create project");
+          }
+        }
+      }
+
       const res = await fetch("/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,6 +62,7 @@ export default function CreateTicketModal({ onSuccess, onClose }: Props) {
             .map((l) => l.trim())
             .filter(Boolean),
           column,
+          project: projectName,
         }),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -58,10 +83,9 @@ export default function CreateTicketModal({ onSuccess, onClose }: Props) {
         style={{ backgroundColor: "#161616", border: "1px solid #2a2a2a" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-4 text-lg font-semibold text-white">
-          Create Ticket
-        </h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">Create Ticket</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          {/* Title */}
           <div>
             <label className="mb-1 block text-sm text-gray-400">
               Title <span className="text-red-400">*</span>
@@ -75,10 +99,10 @@ export default function CreateTicketModal({ onSuccess, onClose }: Props) {
               autoFocus
             />
           </div>
+
+          {/* Description */}
           <div>
-            <label className="mb-1 block text-sm text-gray-400">
-              Description
-            </label>
+            <label className="mb-1 block text-sm text-gray-400">Description</label>
             <textarea
               className="w-full rounded px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-blue-500"
               style={{
@@ -92,17 +116,24 @@ export default function CreateTicketModal({ onSuccess, onClose }: Props) {
               placeholder="Optional description..."
             />
           </div>
+
+          {/* Project */}
+          <div>
+            <label className="mb-1 block text-sm text-gray-400">Project</label>
+            <ProjectCombobox
+              projects={projects}
+              value={project}
+              onSelect={setProject}
+            />
+          </div>
+
+          {/* Priority + Column */}
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="mb-1 block text-sm text-gray-400">
-                Priority
-              </label>
+              <label className="mb-1 block text-sm text-gray-400">Priority</label>
               <select
                 className="w-full rounded px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-blue-500"
-                style={{
-                  backgroundColor: "#1e1e1e",
-                  border: "1px solid #2a2a2a",
-                }}
+                style={{ backgroundColor: "#1e1e1e", border: "1px solid #2a2a2a" }}
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
               >
@@ -115,10 +146,7 @@ export default function CreateTicketModal({ onSuccess, onClose }: Props) {
               <label className="mb-1 block text-sm text-gray-400">Column</label>
               <select
                 className="w-full rounded px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-blue-500"
-                style={{
-                  backgroundColor: "#1e1e1e",
-                  border: "1px solid #2a2a2a",
-                }}
+                style={{ backgroundColor: "#1e1e1e", border: "1px solid #2a2a2a" }}
                 value={column}
                 onChange={(e) => setColumn(e.target.value as Column)}
               >
@@ -129,6 +157,8 @@ export default function CreateTicketModal({ onSuccess, onClose }: Props) {
               </select>
             </div>
           </div>
+
+          {/* Labels */}
           <div>
             <label className="mb-1 block text-sm text-gray-400">
               Labels{" "}
@@ -142,12 +172,14 @@ export default function CreateTicketModal({ onSuccess, onClose }: Props) {
               placeholder="bug, feature, urgent"
             />
           </div>
+
           {error && <p className="text-sm text-red-400">{error}</p>}
+
           <div className="mt-2 flex justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="rounded px-4 py-2 text-sm text-gray-400 hover:text-white"
+              className="rounded px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
               style={{ backgroundColor: "#2a2a2a" }}
             >
               Cancel
@@ -155,7 +187,7 @@ export default function CreateTicketModal({ onSuccess, onClose }: Props) {
             <button
               type="submit"
               disabled={submitting}
-              className="rounded px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+              className="rounded px-4 py-2 text-sm font-medium text-white disabled:opacity-50 transition-opacity"
               style={{ backgroundColor: "#2563eb" }}
             >
               {submitting ? "Creating..." : "Create"}

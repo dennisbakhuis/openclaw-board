@@ -11,8 +11,10 @@ export async function GET(req: NextRequest) {
     const priority = searchParams.get("priority") as Priority | null;
     const label = searchParams.get("label");
     const q = searchParams.get("q");
+    const project = searchParams.get("project");
+    const includeArchived = searchParams.get("includeArchived") === "true";
 
-    let tickets: Ticket[] = readAllTickets();
+    let tickets: Ticket[] = readAllTickets(includeArchived);
 
     if (column) {
       tickets = tickets.filter((t) => t.column === column);
@@ -22,6 +24,9 @@ export async function GET(req: NextRequest) {
     }
     if (label) {
       tickets = tickets.filter((t) => t.labels.includes(label));
+    }
+    if (project) {
+      tickets = tickets.filter((t) => t.project === project);
     }
     if (q) {
       const lower = q.toLowerCase();
@@ -45,13 +50,15 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { title, description, priority, labels, column } = body as {
-      title: string;
-      description?: string;
-      priority?: Priority;
-      labels?: string[];
-      column?: Column;
-    };
+    const { title, description, priority, labels, column, project } =
+      body as {
+        title: string;
+        description?: string;
+        priority?: Priority;
+        labels?: string[];
+        column?: Column;
+        project?: string;
+      };
 
     if (!title) {
       return NextResponse.json({ error: "title is required" }, { status: 400 });
@@ -65,14 +72,12 @@ export async function POST(req: NextRequest) {
       labels: labels ?? [],
       created: new Date().toISOString(),
       column: column ?? "todo",
+      project: project || undefined,
     };
 
     writeTicket(ticket, ticket.column);
     return NextResponse.json(ticket, { status: 201 });
   } catch (err) {
-    return NextResponse.json(
-      { error: String(err) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }

@@ -2,7 +2,7 @@ services:
   openclaw-board:
     image: ghcr.io/dennisbakhuis/openclaw-board:latest
     ports:
-      - "3000:3000"
+      - "4321:4321"
     volumes:
       - ./tickets:/data/tickets
     environment:
@@ -12,7 +12,7 @@ services:
   openclaw-board-local:
     build: .
     ports:
-      - "3000:3000"
+      - "4321:4321"
     volumes:
       - ./tickets:/data/tickets
     environment:
