@@ -11,13 +11,22 @@ interface Props {
   projects: Project[];
 }
 
-const priorityColors: Record<string, { bg: string; text: string }> = {
-  low: { bg: "#14532d", text: "#4ade80" },
-  medium: { bg: "#713f12", text: "#fbbf24" },
-  high: { bg: "#7f1d1d", text: "#f87171" },
+const priorityClasses: Record<string, string> = {
+  low: "bg-green-100 text-green-700 dark:bg-[#14532d] dark:text-[#4ade80]",
+  medium: "bg-yellow-100 text-yellow-700 dark:bg-[#713f12] dark:text-[#fbbf24]",
+  high: "bg-red-100 text-red-700 dark:bg-[#7f1d1d] dark:text-[#f87171]",
 };
 
 const DEFAULT_PROJECT_COLOR = "#6366f1";
+
+function formatDuration(ms: number): string {
+  const days = Math.floor(ms / 86400000);
+  const hours = Math.floor((ms % 86400000) / 3600000);
+  if (days > 0) return `${days}d ${hours}h`;
+  const minutes = Math.floor((ms % 3600000) / 60000);
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
 
 export default function TicketCard({ ticket, onDelete, projects }: Props) {
   const {
@@ -28,12 +37,6 @@ export default function TicketCard({ ticket, onDelete, projects }: Props) {
     transition,
     isDragging,
   } = useSortable({ id: ticket.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-  };
 
   const project = ticket.project
     ? projects.find((p) => p.name === ticket.project)
@@ -46,29 +49,37 @@ export default function TicketCard({ ticket, onDelete, projects }: Props) {
     onDelete(ticket.id);
   }
 
-  const pColors = priorityColors[ticket.priority] ?? priorityColors.medium;
+  const badgeClass = priorityClasses[ticket.priority] ?? priorityClasses.medium;
+
+  const showProcessingTime =
+    (ticket.column === "done" || ticket.column === "archived") &&
+    ticket.processingTime !== undefined;
+
+  const borderLeftStyle = ticket.project
+    ? `4px solid ${projectColor}`
+    : "4px solid transparent";
 
   return (
     <div
       ref={setNodeRef}
       style={{
-        ...style,
-        backgroundColor: "#1e1e1e",
-        border: "1px solid #2a2a2a",
-        borderLeft: ticket.project ? `4px solid ${projectColor}` : "4px solid #2a2a2a",
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.4 : 1,
+        borderLeft: borderLeftStyle,
       }}
-      className="group relative rounded-md p-3 cursor-grab active:cursor-grabbing hover:border-[#3a3a3a] transition-all duration-150"
+      className="group relative rounded-md p-3 cursor-grab active:cursor-grabbing transition-all duration-150 bg-[#f1f3f5] dark:bg-[#1e1e1e] border border-gray-200 dark:border-[#2a2a2a] hover:border-gray-300 dark:hover:border-[#3a3a3a]"
       {...attributes}
       {...listeners}
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="text-sm font-medium text-white leading-snug">
+        <span className="text-sm font-medium text-gray-900 dark:text-white leading-snug">
           {ticket.title}
         </span>
         <button
           onPointerDown={(e) => e.stopPropagation()}
           onClick={handleDelete}
-          className="flex-shrink-0 rounded text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none mt-0.5"
+          className="flex-shrink-0 rounded text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity text-xs leading-none mt-0.5"
           title="Delete ticket"
         >
           ✕
@@ -96,22 +107,25 @@ export default function TicketCard({ ticket, onDelete, projects }: Props) {
 
       {/* Priority and labels */}
       <div className="mt-2 flex flex-wrap items-center gap-1">
-        <span
-          className="rounded-full px-2 py-0.5 text-xs font-semibold"
-          style={{ backgroundColor: pColors.bg, color: pColors.text }}
-        >
+        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badgeClass}`}>
           {ticket.priority}
         </span>
         {ticket.labels.map((label) => (
           <span
             key={label}
-            className="rounded-full px-2 py-0.5 text-xs text-gray-400"
-            style={{ backgroundColor: "#2a2a2a" }}
+            className="rounded-full px-2 py-0.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-[#2a2a2a]"
           >
             {label}
           </span>
         ))}
       </div>
+
+      {/* Processing time for done/archived cards */}
+      {showProcessingTime && (
+        <div className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+          ⏱ {formatDuration(ticket.processingTime!)}
+        </div>
+      )}
     </div>
   );
 }

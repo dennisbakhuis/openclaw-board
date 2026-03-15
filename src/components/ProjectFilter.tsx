@@ -12,7 +12,7 @@ export default function ProjectFilter({ projects, selectedProject, onSelect }: P
   const activeProjects = projects.filter((p) => !p.archived);
 
   return (
-    <div className="flex flex-wrap items-center gap-2 px-6 py-3 border-b" style={{ borderColor: "#2a2a2a" }}>
+    <div className="flex flex-wrap items-center gap-2 px-6 py-3 border-b border-gray-200 dark:border-[#2a2a2a]">
       <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 mr-1">Filter:</span>
 
       <button
@@ -20,11 +20,8 @@ export default function ProjectFilter({ projects, selectedProject, onSelect }: P
         className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
           selectedProject === null
             ? "bg-blue-600 text-white"
-            : "text-gray-400 hover:text-white"
+            : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-[#2a2a2a]"
         }`}
-        style={{
-          backgroundColor: selectedProject === null ? "#2563eb" : "#2a2a2a",
-        }}
       >
         All Projects
       </button>
@@ -33,12 +30,13 @@ export default function ProjectFilter({ projects, selectedProject, onSelect }: P
         <button
           key={p.name}
           onClick={() => onSelect(p.name)}
-          className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-            selectedProject === p.name ? "text-white" : "text-gray-400 hover:text-white"
+          className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors border ${
+            selectedProject === p.name
+              ? "text-gray-900 dark:text-white bg-gray-100 dark:bg-[#2a2a2a]"
+              : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#1e1e1e]"
           }`}
           style={{
-            backgroundColor: selectedProject === p.name ? "#2a2a2a" : "#1e1e1e",
-            border: selectedProject === p.name ? `1px solid ${p.color}` : "1px solid #2a2a2a",
+            borderColor: selectedProject === p.name ? p.color : undefined,
           }}
         >
           <span
@@ -51,15 +49,11 @@ export default function ProjectFilter({ projects, selectedProject, onSelect }: P
 
       <button
         onClick={() => onSelect("archived")}
-        className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+        className={`rounded-full px-3 py-1 text-xs font-medium transition-colors border ${
           selectedProject === "archived"
-            ? "text-white"
-            : "text-gray-500 hover:text-gray-300"
+            ? "text-white bg-red-950 border-red-800"
+            : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 bg-white dark:bg-[#1e1e1e] border-gray-200 dark:border-[#2a2a2a]"
         }`}
-        style={{
-          backgroundColor: selectedProject === "archived" ? "#3a2a2a" : "#1e1e1e",
-          border: selectedProject === "archived" ? "1px solid #7f1d1d" : "1px solid #2a2a2a",
-        }}
       >
         🗄 Archived
       </button>

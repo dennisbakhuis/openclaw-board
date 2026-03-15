@@ -12,6 +12,8 @@ export interface Ticket {
   priority: Priority;
   labels: string[];
   created: string;
+  completedAt?: string;   // ISO string, set when moved to "done" or "archived"
+  processingTime?: number; // milliseconds between created and completedAt
   column: Column;
   project?: string;
 }
@@ -39,6 +41,8 @@ function parseTicketFile(filePath: string, column: Column): Ticket | null {
       priority: (data.priority as Priority) ?? "medium",
       labels: Array.isArray(data.labels) ? data.labels : [],
       created: data.created ?? new Date().toISOString(),
+      completedAt: data.completedAt ?? undefined,
+      processingTime: data.processingTime !== undefined ? Number(data.processingTime) : undefined,
       column,
       project: data.project ?? undefined,
     };
@@ -100,9 +104,10 @@ export function writeTicket(ticket: Ticket, column: Column): void {
     labels: ticket.labels,
     created: ticket.created,
   };
-  if (ticket.project) {
-    frontmatter.project = ticket.project;
-  }
+  if (ticket.completedAt) frontmatter.completedAt = ticket.completedAt;
+  if (ticket.processingTime !== undefined) frontmatter.processingTime = ticket.processingTime;
+  if (ticket.project) frontmatter.project = ticket.project;
+
   const fileContent = matter.stringify(ticket.description, frontmatter);
   fs.writeFileSync(ticketFilePath(ticket.id, column), fileContent, "utf-8");
 }
@@ -111,8 +116,22 @@ export function moveTicket(id: string, newColumn: Column): void {
   const found = findTicket(id);
   if (!found) throw new Error(`Ticket not found: ${id}`);
   const { ticket, filePath } = found;
+
+  let updatedTicket = { ...ticket, column: newColumn };
+
+  if ((newColumn === "done" || newColumn === "archived") && !ticket.completedAt) {
+    const completedAt = new Date().toISOString();
+    const processingTime = new Date(completedAt).getTime() - new Date(ticket.created).getTime();
+    updatedTicket = { ...updatedTicket, completedAt, processingTime };
+  }
+
+  // If moving back from done/archived to another column, clear completion fields
+  if (newColumn !== "done" && newColumn !== "archived") {
+    updatedTicket = { ...updatedTicket, completedAt: undefined, processingTime: undefined };
+  }
+
   fs.unlinkSync(filePath);
-  writeTicket({ ...ticket, column: newColumn }, newColumn);
+  writeTicket(updatedTicket, newColumn);
 }
 
 export function deleteTicket(id: string): void {

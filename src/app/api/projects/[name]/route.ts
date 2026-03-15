@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readProjects, writeProjects, archiveProject, PROJECT_COLORS } from "@/lib/projects";
+import { readProjects, writeProjects, archiveProject, PROJECT_COLORS, assignColorIndex } from "@/lib/projects";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +15,21 @@ export async function PUT(
 
     if (archived === true) {
       archiveProject(projectName);
+    }
+
+    if (archived === false) {
+      // Unarchive: re-assign a color index
+      const data = readProjects();
+      const project = data.projects.find((p) => p.name === projectName);
+      if (project && project.archived) {
+        project.archived = false;
+        const colorIndex = assignColorIndex(data);
+        project.colorIndex = colorIndex;
+        project.color = colorIndex >= 0
+          ? PROJECT_COLORS[colorIndex]
+          : PROJECT_COLORS[PROJECT_COLORS.length - 1];
+        writeProjects(data);
+      }
     }
 
     if (color) {
