@@ -1,5 +1,15 @@
 services:
   openclaw-board:
+    image: ghcr.io/dennisbakhuis/openclaw-board:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./tickets:/data/tickets
+    environment:
+      - TICKETS_DIR=/data/tickets
+    restart: unless-stopped
+
+  openclaw-board-local:
     build: .
     ports:
       - "3000:3000"
@@ -8,3 +18,5 @@ services:
     environment:
       - TICKETS_DIR=/data/tickets
     restart: unless-stopped
+    profiles:
+      - local
