@@ -69,6 +69,42 @@ docker compose up
 
 Tickets are persisted in the `./tickets` folder on the host via a bind mount.
 
+## Container Registry
+
+The Docker image is automatically built and pushed to GitHub Container Registry on every push to `main`.
+
+### Pull and run
+
+```bash
+docker pull ghcr.io/dennisbakhuis/openclaw-board:latest
+docker run -p 3000:3000 -v $(pwd)/tickets:/data/tickets \
+  -e TICKETS_DIR=/data/tickets \
+  ghcr.io/dennisbakhuis/openclaw-board:latest
+```
+
+### Docker Compose with ghcr.io image
+
+```yaml
+services:
+  openclaw-board:
+    image: ghcr.io/dennisbakhuis/openclaw-board:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./tickets:/data/tickets
+    environment:
+      - TICKETS_DIR=/data/tickets
+    restart: unless-stopped
+```
+
+### Available tags
+
+| Tag | Description |
+|-----|-------------|
+| `latest` | Latest build from `main` |
+| `main` | Same as latest |
+| `sha-<short>` | Pinned to a specific commit |
+
 ## API
 
 | Method | Path | Description |
