@@ -156,11 +156,10 @@ export default function Board({ initialTickets, projects }: Props) {
     <div className="flex flex-col h-full">
       {/* Toolbar */}
       <div className="flex items-center justify-between px-6 py-4">
-        <div /> {/* spacer — logo is in header now */}
+        <div /> {/* spacer */}
         <button
           onClick={() => setShowModal(true)}
-          className="rounded-md px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-          style={{ backgroundColor: "#2563eb" }}
+          className="rounded-md px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90 bg-[#2563eb]"
         >
           + New Ticket
         </button>
@@ -199,15 +198,8 @@ export default function Board({ initialTickets, projects }: Props) {
 
           <DragOverlay>
             {activeTicket && (
-              <div
-                className="rounded-md p-3 shadow-xl rotate-1"
-                style={{
-                  backgroundColor: "#1e1e1e",
-                  border: "1px solid #3a3a3a",
-                  opacity: 0.95,
-                }}
-              >
-                <span className="text-sm font-medium text-white">
+              <div className="rounded-md p-3 shadow-xl rotate-1 bg-white dark:bg-[#1e1e1e] border border-gray-300 dark:border-[#3a3a3a]">
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
                   {activeTicket.title}
                 </span>
               </div>

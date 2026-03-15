@@ -8,8 +8,8 @@ export default function Home() {
   const projectsData = readProjects();
 
   return (
-    <main className="min-h-screen" style={{ backgroundColor: "#0f0f0f" }}>
+    <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#0f0f0f]">
       <Board initialTickets={tickets} projects={projectsData.projects} />
-    </main>
+    </div>
   );
 }

@@ -57,8 +57,7 @@ export default function ProjectCombobox({ projects, value, onSelect }: Props) {
     <div ref={containerRef} className="relative">
       <input
         type="text"
-        className="w-full rounded px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-blue-500"
-        style={{ backgroundColor: "#1e1e1e", border: "1px solid #2a2a2a" }}
+        className="w-full rounded px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50 dark:bg-[#1e1e1e] border border-gray-200 dark:border-[#2a2a2a]"
         value={inputValue}
         onChange={handleInputChange}
         onFocus={() => setOpen(true)}
@@ -67,19 +66,14 @@ export default function ProjectCombobox({ projects, value, onSelect }: Props) {
       />
       {open && (filtered.length > 0 || (inputValue.trim() && !exactMatch)) && (
         <div
-          className="absolute z-50 mt-1 w-full rounded border shadow-lg"
-          style={{
-            backgroundColor: "#1e1e1e",
-            border: "1px solid #2a2a2a",
-            maxHeight: "200px",
-            overflowY: "auto",
-          }}
+          className="absolute z-50 mt-1 w-full rounded border shadow-lg bg-white dark:bg-[#1e1e1e] border-gray-200 dark:border-[#2a2a2a]"
+          style={{ maxHeight: "200px", overflowY: "auto" }}
         >
           {filtered.map((p) => (
             <button
               key={p.name}
               type="button"
-              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-white hover:bg-[#2a2a2a] transition-colors"
+              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors"
               onMouseDown={(e) => {
                 e.preventDefault();
                 handleSelect(p.name);
@@ -95,13 +89,13 @@ export default function ProjectCombobox({ projects, value, onSelect }: Props) {
           {inputValue.trim() && !exactMatch && (
             <button
               type="button"
-              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-blue-400 hover:bg-[#2a2a2a] transition-colors"
+              className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-blue-500 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors"
               onMouseDown={(e) => {
                 e.preventDefault();
                 handleSelect(inputValue.trim());
               }}
             >
-              <span className="text-blue-500">+</span>
+              <span>+</span>
               Create project: <span className="font-medium">{inputValue.trim()}</span>
             </button>
           )}

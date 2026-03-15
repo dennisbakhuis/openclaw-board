@@ -73,26 +73,27 @@ export default function CreateTicketModal({ projects, onSuccess, onClose }: Prop
     }
   }
 
+  const inputClass =
+    "w-full rounded px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50 dark:bg-[#1e1e1e] border border-gray-200 dark:border-[#2a2a2a]";
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-lg p-6 shadow-xl"
-        style={{ backgroundColor: "#161616", border: "1px solid #2a2a2a" }}
+        className="w-full max-w-md rounded-lg p-6 shadow-xl bg-white dark:bg-[#161616] border border-gray-200 dark:border-[#2a2a2a]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-4 text-lg font-semibold text-white">Create Ticket</h2>
+        <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Create Ticket</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           {/* Title */}
           <div>
-            <label className="mb-1 block text-sm text-gray-400">
+            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
               Title <span className="text-red-400">*</span>
             </label>
             <input
-              className="w-full rounded px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-blue-500"
-              style={{ backgroundColor: "#1e1e1e", border: "1px solid #2a2a2a" }}
+              className={inputClass}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ticket title"
@@ -102,15 +103,10 @@ export default function CreateTicketModal({ projects, onSuccess, onClose }: Prop
 
           {/* Description */}
           <div>
-            <label className="mb-1 block text-sm text-gray-400">Description</label>
+            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">Description</label>
             <textarea
-              className="w-full rounded px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-blue-500"
-              style={{
-                backgroundColor: "#1e1e1e",
-                border: "1px solid #2a2a2a",
-                resize: "vertical",
-                minHeight: "80px",
-              }}
+              className={inputClass}
+              style={{ resize: "vertical", minHeight: "80px" }}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Optional description..."
@@ -119,7 +115,7 @@ export default function CreateTicketModal({ projects, onSuccess, onClose }: Prop
 
           {/* Project */}
           <div>
-            <label className="mb-1 block text-sm text-gray-400">Project</label>
+            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">Project</label>
             <ProjectCombobox
               projects={projects}
               value={project}
@@ -130,10 +126,9 @@ export default function CreateTicketModal({ projects, onSuccess, onClose }: Prop
           {/* Priority + Column */}
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="mb-1 block text-sm text-gray-400">Priority</label>
+              <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">Priority</label>
               <select
-                className="w-full rounded px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-blue-500"
-                style={{ backgroundColor: "#1e1e1e", border: "1px solid #2a2a2a" }}
+                className={inputClass}
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
               >
@@ -143,10 +138,9 @@ export default function CreateTicketModal({ projects, onSuccess, onClose }: Prop
               </select>
             </div>
             <div className="flex-1">
-              <label className="mb-1 block text-sm text-gray-400">Column</label>
+              <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">Column</label>
               <select
-                className="w-full rounded px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-blue-500"
-                style={{ backgroundColor: "#1e1e1e", border: "1px solid #2a2a2a" }}
+                className={inputClass}
                 value={column}
                 onChange={(e) => setColumn(e.target.value as Column)}
               >
@@ -160,13 +154,12 @@ export default function CreateTicketModal({ projects, onSuccess, onClose }: Prop
 
           {/* Labels */}
           <div>
-            <label className="mb-1 block text-sm text-gray-400">
+            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
               Labels{" "}
-              <span className="text-xs text-gray-600">(comma-separated)</span>
+              <span className="text-xs text-gray-400">(comma-separated)</span>
             </label>
             <input
-              className="w-full rounded px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-blue-500"
-              style={{ backgroundColor: "#1e1e1e", border: "1px solid #2a2a2a" }}
+              className={inputClass}
               value={labels}
               onChange={(e) => setLabels(e.target.value)}
               placeholder="bug, feature, urgent"
@@ -179,16 +172,14 @@ export default function CreateTicketModal({ projects, onSuccess, onClose }: Prop
             <button
               type="button"
               onClick={onClose}
-              className="rounded px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
-              style={{ backgroundColor: "#2a2a2a" }}
+              className="rounded px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors bg-gray-100 dark:bg-[#2a2a2a] hover:bg-gray-200 dark:hover:bg-[#333]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="rounded px-4 py-2 text-sm font-medium text-white disabled:opacity-50 transition-opacity"
-              style={{ backgroundColor: "#2563eb" }}
+              className="rounded px-4 py-2 text-sm font-medium text-white disabled:opacity-50 transition-opacity bg-[#2563eb] hover:bg-blue-600"
             >
               {submitting ? "Creating..." : "Create"}
             </button>
